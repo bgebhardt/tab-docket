@@ -38,10 +38,11 @@ Discards tabs after a configurable idle time and lets you whitelist hosts, so me
 
 ## Where Tab Stash fits
 
-The gap: no tool kept a **single tab, in a named group, visible every time a new tab opens**. Tab Stash covers it:
+The gap: no tool kept a **single tab, in a named group, one keystroke away**. Tab Stash covers it:
 
-- `Alt+Shift+S` sends the current tab (or selected tabs, or the window) to a group and closes it.
-- The New Tab page shows every group, with age and stale highlighting.
+- `Alt+Shift+Q` stashes the current tab to the Inbox and closes it, no questions asked. Tap it, tab through the strip, tap it again.
+- `Alt+Shift+S` sends the current tab (or selected tabs, or the window) to a named group; an AI/heuristic name is suggested for multi-tab stashes.
+- `Alt+Shift+O` opens the stash page (every group, with age and stale highlighting). Comet's New Tab stays Perplexity.
 - It is a queue: items are meant to be done or dropped, not kept forever.
 
 ## Deciding where a tab goes
@@ -72,7 +73,7 @@ These came out of a memory-pressure investigation in October 2026, when Comet al
 These are suggestions, not established routines:
 
 - Stash instead of leaving tabs open "just in case".
-- Skim the New Tab page each morning, and clear one stale item a day.
+- Skim the stash page (`Alt+Shift+O`) each morning, and clear one stale item a day.
 - Keep the number of groups small (5 to 8) so the page stays readable.
 
 ## Changing this document

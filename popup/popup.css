@@ -119,3 +119,73 @@ footer label {
   color: var(--accent);
   font-weight: 600;
 }
+
+.suggest {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.suggest .label {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.chip {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 12px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chip:hover {
+  background: var(--surface-hover);
+}
+
+.chip.ai {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.link {
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-size: 12px;
+  padding: 0;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.view {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-hover);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.view:hover {
+  border-color: var(--accent);
+}
+
+.view .count {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}

@@ -4,7 +4,7 @@ Chromium MV3 extension (no build step, no dependencies). Read `README.md` for us
 
 ## Why this exists
 
-The owner (Bryan) runs Comet (Chromium-based) with far too many tabs and had memory pressure (Comet alone used 6–13 GB, swap nearly full). He already uses Tab Manager Plus (finding open tabs), Session Buddy (stashing whole sessions) and Raindrop.io (long-term storage). His recurring problem: anything saved goes out of sight and is never revisited. Tab Stash is a **working set**: tabs to deal with soon, grouped by topic, shown on every New Tab page, with age/staleness surfaced. It is deliberately **not** an archive, session manager or tab sleeper.
+The owner (Bryan) runs Comet (Chromium-based) with far too many tabs and had memory pressure (Comet alone used 6–13 GB, swap nearly full). He already uses Tab Manager Plus (finding open tabs), Session Buddy (stashing whole sessions) and Raindrop.io (long-term storage). His recurring problem: anything saved goes out of sight and is never revisited. Tab Stash is a **working set**: tabs to deal with soon, grouped by topic, viewable on a dedicated stash page (the New Tab page is left alone: Comet's is Perplexity), with age/staleness surfaced. It is deliberately **not** an archive, session manager or tab sleeper.
 
 The full picture of his tools and where each fits is in `docs/WORKFLOW.md`.
 
@@ -17,12 +17,13 @@ Hard requirements from him: free (no paid tiers, no caps), send a single tab to 
 - Keep `lib/util.js` free of `chrome.*` so it stays unit-testable; all browser calls go through `lib/stash.js`.
 - New items are appended; oldest item is at the top (queue semantics).
 - A URL exists at most once in the stash; re-stashing moves it.
+- AI name suggestions must stay on-device (Prompt API) or offline heuristics; no cloud LLM calls.
 - No network requests, minimal permissions (`bookmarks`, `tabs`, `storage`, `favicon`).
 
 ## Status
 
-- v0.1.0 implemented. Unit tests pass (`npm test`). **The popup and New Tab UI have never been run in a real browser**: the first session could not load the extension. Verify with the checklist in `docs/DESIGN.md` and fix whatever breaks.
-- Unverified assumptions about Comet: the `chrome_url_overrides` New Tab override, the `_favicon/` endpoint, and the `Alt+Shift+S` command.
+- v0.2.0 implemented (quick-stash shortcut, name suggestions, options page, stash page instead of New Tab override). Unit tests pass (`npm test`). Bryan has loaded v0.1 in Comet and the popup/stash page worked; v0.2 additions are untested in a browser. Verify with the checklist in `docs/DESIGN.md` and fix whatever breaks.
+- Unverified assumptions about Comet: the `_favicon/` endpoint, the `Alt+Shift+S/Q/O` commands, and whether `LanguageModel` (Prompt API) exists (suggestions fall back to heuristics).
 - Known gap: drag-and-drop only moves between groups (no reorder; `bookmarks.move` has an off-by-one quirk when moving down within the same folder).
 
 ## Commands

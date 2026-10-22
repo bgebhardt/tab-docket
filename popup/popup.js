@@ -3,10 +3,19 @@ import {
   createGroup,
   getGroups,
   getSettings,
+  openBoard,
   setSettings,
   stashTabs,
 } from '../lib/stash.js';
-import { INBOX_TITLE, cleanGroupName, filterGroups, hasGroupNamed, isStashable } from '../lib/util.js';
+import { aiSuggestName } from '../lib/ai.js';
+import {
+  INBOX_TITLE,
+  cleanGroupName,
+  filterGroups,
+  hasGroupNamed,
+  isStashable,
+  suggestGroupNames,
+} from '../lib/util.js';
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -17,6 +26,7 @@ const state = {
   query: '',
   active: 0,
   busy: false,
+  suggestions: [], // [{ name, ai }]
 };
 
 function el(tag, className, text) {
@@ -70,6 +80,7 @@ function renderScopes() {
       state.scope = scope;
       renderScopes();
       renderSubject();
+      loadSuggestions();
       $('#query').focus();
     });
     box.append(button);
@@ -105,6 +116,46 @@ function renderRows() {
     item.append(button);
     list.append(item);
   });
+}
+
+function renderSuggestions() {
+  const box = $('#suggest');
+  box.replaceChildren();
+  box.hidden = !state.suggestions.length;
+  if (box.hidden) return;
+  box.append(el('span', 'label', 'Name it:'));
+  for (const { name, ai } of state.suggestions) {
+    const chip = el('button', ai ? 'chip ai' : 'chip', ai ? `✨ ${name}` : name);
+    chip.title = ai ? 'Suggested by on-device AI' : 'Suggested from the tab titles and sites';
+    chip.addEventListener('click', () => {
+      const input = $('#query');
+      input.value = name;
+      state.query = name;
+      state.active = 0;
+      renderRows();
+      input.focus();
+    });
+    box.append(chip);
+  }
+}
+
+// Offline guesses show instantly; the on-device AI name (if the browser has it) is added when ready.
+async function loadSuggestions() {
+  const scope = state.scope;
+  const tabs = scope.tabs;
+  const existing = state.groups.map((g) => g.title);
+  const isCurrent = () => state.scope === scope;
+
+  state.suggestions = suggestGroupNames(tabs).map((name) => ({ name, ai: false }));
+  renderSuggestions();
+
+  const name = await aiSuggestName(tabs, existing);
+  if (!name || !isCurrent()) return;
+  state.suggestions = [
+    { name, ai: true },
+    ...state.suggestions.filter((s) => s.name.toLowerCase() !== name.toLowerCase()),
+  ].slice(0, 4);
+  renderSuggestions();
 }
 
 // ---------- actions ----------
@@ -167,6 +218,12 @@ async function init() {
   renderScopes();
   renderSubject();
   renderRows();
+  loadSuggestions();
+  $('#boardCount').textContent = String(state.groups.reduce((sum, g) => sum + g.count, 0)) + ' ↗';
+  $('#openBoard').addEventListener('click', async () => {
+    await openBoard();
+    window.close();
+  });
 
   const query = $('#query');
   query.addEventListener('input', () => {

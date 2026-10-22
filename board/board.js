@@ -4,11 +4,12 @@ import {
   getGroups,
   moveItem,
   openItems,
+  openOrFocus,
   removeItem,
   renameGroup,
   restoreItem,
 } from '../lib/stash.js';
-import { STALE_DAYS, ageLabel, domainOf, isStale } from '../lib/util.js';
+import { COMPANION_TOOLS, STALE_DAYS, ageLabel, domainOf, isStale, pickItems } from '../lib/util.js';
 
 const $ = (selector) => document.querySelector(selector);
 const OPEN_CONFIRM_THRESHOLD = 10;
@@ -18,6 +19,7 @@ let query = '';
 let draggingId = null;
 let toastTimer = null;
 let undo = null;
+const flagged = new Set(); // ids of flagged items (in memory only)
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -37,6 +39,8 @@ function button(label, className, onClick, title) {
 
 async function load() {
   ({ groups } = await getGroups());
+  const existing = new Set(groups.flatMap((g) => g.items.map((i) => i.id)));
+  for (const id of flagged) if (!existing.has(id)) flagged.delete(id);
   render();
 }
 
@@ -73,6 +77,16 @@ function itemEl(item, group) {
     li.classList.remove('dragging');
   });
 
+  const flag = el('input', 'flag');
+  flag.type = 'checkbox';
+  flag.checked = flagged.has(item.id);
+  flag.title = 'Flag this tab';
+  flag.setAttribute('aria-label', `Flag ${item.title}`);
+  flag.addEventListener('change', () => {
+    toggleFlag([item.id], flag.checked);
+  });
+  li.classList.toggle('flagged', flag.checked);
+
   const link = el('a', 'link');
   link.href = item.url;
   link.title = item.url;
@@ -91,7 +105,7 @@ function itemEl(item, group) {
   if (isStale(item.dateAdded)) age.title = `In the stash for ${STALE_DAYS}+ days — do it or drop it`;
 
   const done = button('✓', 'ghost done', () => dismiss(item, group), 'Done — remove from stash');
-  li.append(link, age, done);
+  li.append(flag, link, age, done);
   return li;
 }
 
@@ -100,7 +114,17 @@ function groupEl(group) {
   const section = el('section', 'group');
 
   const head = el('div', 'group-head');
-  head.append(el('h2', '', group.title), el('span', 'count', String(group.items.length)));
+  const visibleIds = items.map((i) => i.id);
+  const flaggedHere = visibleIds.filter((id) => flagged.has(id)).length;
+  const all = el('input', 'flag');
+  all.type = 'checkbox';
+  all.checked = visibleIds.length > 0 && flaggedHere === visibleIds.length;
+  all.indeterminate = flaggedHere > 0 && flaggedHere < visibleIds.length;
+  all.disabled = !visibleIds.length;
+  all.title = 'Flag every tab in this group';
+  all.setAttribute('aria-label', `Flag all in ${group.title}`);
+  all.addEventListener('change', () => toggleFlag(visibleIds, all.checked));
+  head.append(all, el('h2', '', group.title), el('span', 'count', String(group.items.length)));
   section.append(head);
 
   const actions = el('div', 'actions');
@@ -156,7 +180,7 @@ function render() {
     const welcome = el('div', 'welcome');
     welcome.append(
       el('h2', '', 'Your working set is empty'),
-      el('p', '', 'Click the Tab Stash toolbar button on any page to park it in a group. It will show up here.'),
+      el('p', '', 'Click the Tab Stash toolbar button on any page to park it in a group, or press the quick-stash shortcut to save and close a tab in one step.'),
     );
     board.append(welcome);
     return;
@@ -168,6 +192,44 @@ function render() {
     if (q && !visible) continue;
     board.append(groupEl(group));
   }
+  renderBulk();
+}
+
+// ---------- flagged tabs ----------
+
+function toggleFlag(ids, on) {
+  for (const id of ids) {
+    if (on) flagged.add(id);
+    else flagged.delete(id);
+  }
+  render();
+}
+
+function renderBulk() {
+  const bar = $('#bulk');
+  const picked = pickItems(groups, flagged);
+  bar.hidden = !picked.length;
+  bar.replaceChildren();
+  if (!picked.length) return;
+
+  const move = el('select');
+  move.setAttribute('aria-label', 'Move flagged tabs to a group');
+  move.append(new Option('Move to…', ''));
+  for (const g of groups) move.append(new Option(g.title, g.id));
+  move.append(new Option('＋ New group…', 'new'));
+  move.addEventListener('change', () => {
+    const value = move.value;
+    move.value = '';
+    if (value) moveFlagged(value);
+  });
+
+  bar.append(
+    el('span', 'bulk-count', `${picked.length} flagged`),
+    button('Open', 'ghost', () => openFlagged(), 'Open the flagged tabs, keep them stashed'),
+    move,
+    button('Delete', 'ghost danger', () => deleteFlagged(), 'Remove the flagged tabs from the stash'),
+    button('Clear', 'ghost', () => toggleFlag([...flagged], false), 'Unflag everything (Esc)'),
+  );
 }
 
 // ---------- actions ----------
@@ -190,6 +252,43 @@ async function dismiss(item, group) {
   showToast('Removed from stash', async () => {
     await restoreItem({ parentId: group.id, index, title: item.title, url: item.url });
   });
+}
+
+async function openFlagged() {
+  const items = pickItems(groups, flagged).map((p) => p.item);
+  if (items.length > OPEN_CONFIRM_THRESHOLD && !confirm(`Open ${items.length} tabs at once? That can use a lot of memory.`)) return;
+  await openItems(items);
+}
+
+async function deleteFlagged() {
+  const picked = pickItems(groups, flagged);
+  flagged.clear();
+  for (const { item } of picked) await removeItem(item.id);
+  showToast(`Removed ${picked.length} tab${picked.length === 1 ? '' : 's'} from stash`, async () => {
+    // picked is in board order, so indexes are restored lowest first within each group.
+    for (const { item, group, index } of picked) {
+      await restoreItem({ parentId: group.id, index, title: item.title, url: item.url });
+    }
+  });
+}
+
+async function moveFlagged(target) {
+  try {
+    let groupId = target;
+    if (target === 'new') {
+      const name = prompt('New group name');
+      if (name === null) return;
+      groupId = (await createGroup(name)).id;
+    }
+    const picked = pickItems(groups, flagged);
+    flagged.clear();
+    for (const { item } of picked) {
+      if (item.parentId !== groupId) await moveItem(item.id, groupId);
+    }
+    load();
+  } catch (err) {
+    showToast(err.message);
+  }
 }
 
 async function openGroup(group, clear) {
@@ -229,10 +328,15 @@ async function addGroup() {
 
 async function showShortcutHint() {
   const commands = await chrome.commands.getAll();
-  const shortcut = commands.find((c) => c.name === '_execute_action')?.shortcut;
-  $('#hint').textContent = shortcut
-    ? `Stash the current tab with ${shortcut}`
-    : 'No keyboard shortcut set — assign one on the extensions shortcuts page.';
+  const key = (name) => commands.find((c) => c.name === name)?.shortcut;
+  const parts = [
+    ['_execute_action', 'pick a group'],
+    ['quick-stash', 'stash & close current tab'],
+    ['open-board', 'open this page'],
+  ].map(([name, what]) => (key(name) ? `${key(name)} ${what}` : null));
+  $('#hint').textContent = parts.some(Boolean)
+    ? parts.filter(Boolean).join(' · ')
+    : 'No keyboard shortcuts set — assign them on the extensions shortcuts page.';
 }
 
 // ---------- init ----------
@@ -242,6 +346,20 @@ $('#search').addEventListener('input', (e) => {
   render();
 });
 $('#newGroup').addEventListener('click', addGroup);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && flagged.size && !(e.target instanceof HTMLInputElement)) toggleFlag([...flagged], false);
+});
+for (const tool of COMPANION_TOOLS) {
+  $('#tools').append(
+    button(`${tool.name} ↗`, 'ghost', async () => {
+      try {
+        await openOrFocus(tool.url);
+      } catch (err) {
+        showToast(`Couldn’t open ${tool.name}: ${err.message}`);
+      }
+    }, `Open ${tool.name} in a tab`),
+  );
+}
 $('#toastUndo').addEventListener('click', async () => {
   const action = undo;
   undo = null;

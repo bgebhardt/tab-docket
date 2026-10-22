@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>New Tab</title>
+    <title>Tab Stash</title>
     <link rel="stylesheet" href="../styles/theme.css" />
-    <link rel="stylesheet" href="newtab.css" />
+    <link rel="stylesheet" href="board.css" />
   </head>
   <body>
     <header>
@@ -15,16 +15,19 @@
       </div>
       <input id="search" type="search" placeholder="Filter stash…" autocomplete="off" aria-label="Filter stash" />
       <button id="newGroup" class="ghost">＋ New group</button>
+      <nav id="tools" class="tools" aria-label="Other tab tools"></nav>
     </header>
 
     <main id="board"></main>
     <p id="hint" class="hint"></p>
+
+    <div id="bulk" class="bulk" role="toolbar" aria-label="Flagged tabs" hidden></div>
 
     <div id="toast" class="toast" role="status" aria-live="polite" hidden>
       <span id="toastText"></span>
       <button id="toastUndo" class="ghost">Undo</button>
     </div>
 
-    <script type="module" src="newtab.js"></script>
+    <script type="module" src="board.js"></script>
   </body>
 </html>

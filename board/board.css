@@ -214,3 +214,57 @@ h1 {
   background: none;
   text-decoration: underline;
 }
+
+.tools {
+  display: flex;
+  gap: 4px;
+}
+
+.flag {
+  flex: none;
+  margin: 0 2px 0 6px;
+  cursor: pointer;
+}
+
+.group-head .flag {
+  margin: 0 8px 0 0;
+}
+
+.item.flagged {
+  background: var(--surface-hover);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.bulk {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.25);
+  z-index: 5;
+}
+
+.bulk[hidden] {
+  display: none;
+}
+
+.bulk-count {
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.bulk select {
+  font: inherit;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+}

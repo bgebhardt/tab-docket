@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Tab Stash",
-  "version": "0.1.0",
-  "description": "A visible working set of tabs. Send tabs to named groups and see them every time you open a new tab.",
+  "version": "0.2.0",
+  "description": "A visible working set of tabs. Send tabs to named groups, stash the current tab with one shortcut, and keep the list one keystroke away.",
   "permissions": ["bookmarks", "tabs", "storage", "favicon"],
   "action": {
     "default_title": "Stash tab",
@@ -12,8 +12,9 @@
     "service_worker": "background.js",
     "type": "module"
   },
-  "chrome_url_overrides": {
-    "newtab": "newtab/newtab.html"
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
   },
   "commands": {
     "_execute_action": {
@@ -21,7 +22,21 @@
         "default": "Alt+Shift+S",
         "mac": "Alt+Shift+S"
       },
-      "description": "Stash the current tab"
+      "description": "Open the stash popup (pick a group)"
+    },
+    "quick-stash": {
+      "suggested_key": {
+        "default": "Alt+Shift+Q",
+        "mac": "Alt+Shift+Q"
+      },
+      "description": "Quick stash: save the current tab and close it, no popup"
+    },
+    "open-board": {
+      "suggested_key": {
+        "default": "Alt+Shift+O",
+        "mac": "Alt+Shift+O"
+      },
+      "description": "Open the stash page"
     }
   },
   "icons": {

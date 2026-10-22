@@ -6,7 +6,7 @@ export function installFakeChrome() {
   const nodes = new Map();
   const sync = {}; // storage.local contents
   const tabs = [];
-  const calls = { tabsRemoved: [], tabsCreated: [] };
+  const calls = { removeFailures: 0, tabsRemoved: [], tabsCreated: [], tabsUpdated: [], windowsUpdated: [] };
 
   const add = (node) => {
     nodes.set(node.id, node);
@@ -95,16 +95,39 @@ export function installFakeChrome() {
         drop(node);
       },
     },
+    runtime: { getURL: (path) => `chrome-extension://fake/${path}` },
+    windows: {
+      async update(id, props) {
+        calls.windowsUpdated.push({ id, ...props });
+      },
+    },
     tabs: {
-      async query({ windowId }) {
-        return tabs.filter((t) => t.windowId === windowId);
+      async query({ windowId, url }) {
+        return tabs.filter((t) => (windowId === undefined || t.windowId === windowId) && (!url || t.url === url));
+      },
+      async get(id) {
+        const found = tabs.find((t) => t.id === id);
+        if (!found) throw new Error(`No tab with id: ${id}`);
+        return found;
+      },
+      async update(id, props) {
+        calls.tabsUpdated.push({ id, ...props });
       },
       async create(props) {
         calls.tabsCreated.push(props);
         return props;
       },
       async remove(ids) {
-        calls.tabsRemoved.push(...ids);
+        if (calls.removeFailures > 0) {
+          calls.removeFailures--;
+          throw new Error('Tabs cannot be edited right now (user may be dragging a tab).');
+        }
+        for (const id of [ids].flat()) {
+          if (calls.ignoreRemove) continue; // simulates a browser that resolves without closing
+          calls.tabsRemoved.push(id);
+          const i = tabs.findIndex((t) => t.id === id);
+          if (i >= 0) tabs.splice(i, 1);
+        }
       },
     },
   };

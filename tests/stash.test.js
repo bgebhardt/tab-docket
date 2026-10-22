@@ -125,3 +125,87 @@ test('closeTabs leaves the window alone when other tabs remain', async () => {
   assert.deepEqual(fake.calls.tabsCreated, []);
   assert.deepEqual(fake.calls.tabsRemoved, [1, 2]);
 });
+
+test('quickStash saves to the Inbox and closes the tab', async () => {
+  fake.sync.closeAfter = true;
+  fake.tabs.push(tab(1, 'https://a.test/'), tab(2, 'https://b.test/'));
+  const result = await stash.quickStash(fake.tabs[0]);
+  assert.equal(result.saved, 1);
+  const { groups } = await stash.getGroups();
+  assert.deepEqual(groups.map((g) => [g.title, g.items.length]), [['Inbox', 1]]);
+  assert.deepEqual(fake.calls.tabsRemoved, [1]);
+});
+
+test('quickStash reuses one Inbox', async () => {
+  await stash.quickStash(tab(1, 'https://a.test/'));
+  await stash.quickStash(tab(2, 'https://b.test/'));
+  const { groups } = await stash.getGroups();
+  assert.equal(groups.length, 1);
+  assert.equal(groups[0].items.length, 2);
+  assert.deepEqual(fake.calls.tabsRemoved, []);
+});
+
+test('quickStash does not close the tab by default', async () => {
+  fake.tabs.push(tab(1, 'https://a.test/'), tab(2, 'https://b.test/'));
+  await stash.quickStash(fake.tabs[0]);
+  assert.deepEqual(fake.calls.tabsRemoved, []);
+});
+
+test('quickStash leaves internal pages alone', async () => {
+  fake.sync.closeAfter = true;
+  const result = await stash.quickStash(tab(1, 'chrome://settings'));
+  assert.equal(result.done.length, 0);
+  assert.deepEqual(fake.calls.tabsRemoved, []);
+});
+
+test('quickStash uses the last group when configured, and falls back when it is gone', async () => {
+  const trip = await stash.createGroup('Trip');
+  fake.sync.quickTarget = 'last';
+  fake.sync.lastGroupId = trip.id;
+  await stash.quickStash(tab(1, 'https://a.test/'));
+  let { groups } = await stash.getGroups();
+  assert.equal(groups.find((g) => g.title === 'Trip').items.length, 1);
+
+  await stash.deleteGroup(trip.id);
+  await stash.quickStash(tab(2, 'https://b.test/'));
+  ({ groups } = await stash.getGroups());
+  assert.deepEqual(groups.map((g) => g.title), ['Inbox']);
+});
+
+test('openBoard opens the page once, then focuses it', async () => {
+  await stash.openBoard();
+  assert.equal(fake.calls.tabsCreated.length, 1);
+  fake.tabs.push({ id: 9, windowId: 4, url: fake.calls.tabsCreated[0].url });
+  await stash.openBoard();
+  assert.equal(fake.calls.tabsCreated.length, 1);
+  assert.deepEqual(fake.calls.tabsUpdated, [{ id: 9, active: true }]);
+  assert.deepEqual(fake.calls.windowsUpdated, [{ id: 4, focused: true }]);
+});
+
+test('openOrFocus focuses an existing tab for the url and opens one otherwise', async () => {
+  await stash.openOrFocus('chrome-extension://abc/main.html');
+  assert.equal(fake.calls.tabsCreated.length, 1);
+  fake.tabs.push({ id: 5, windowId: 2, url: 'chrome-extension://abc/main.html' });
+  await stash.openOrFocus('chrome-extension://abc/main.html');
+  assert.equal(fake.calls.tabsCreated.length, 1);
+  assert.deepEqual(fake.calls.tabsUpdated, [{ id: 5, active: true }]);
+});
+
+test('closeTabs retries a transient tabs.remove failure', async () => {
+  fake.tabs.push(tab(1, 'https://a.test/'), tab(2, 'https://b.test/'));
+  fake.calls.removeFailures = 2;
+  await stash.closeTabs([fake.tabs[0]]);
+  assert.deepEqual(fake.calls.tabsRemoved, [1]);
+});
+
+test('closeTabs does not open a replacement tab when the window query comes back empty', async () => {
+  await stash.closeTabs([tab(1, 'https://a.test/')]);
+  assert.deepEqual(fake.calls.tabsCreated, []);
+  assert.deepEqual(fake.calls.tabsRemoved, [1]);
+});
+
+test('closeTabs throws when the browser says it removed a tab but the tab is still open', async () => {
+  fake.tabs.push(tab(1, 'https://a.test/'), tab(2, 'https://b.test/'));
+  fake.calls.ignoreRemove = true;
+  await assert.rejects(stash.closeTabs([fake.tabs[0]]), /did not close the tab \(tab id 1\)/);
+});

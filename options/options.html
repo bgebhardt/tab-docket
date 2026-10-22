@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tab Stash options</title>
+    <link rel="stylesheet" href="../styles/theme.css" />
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <h1>Tab Stash options</h1>
+
+    <section>
+      <label class="row">
+        <input id="closeAfter" type="checkbox" />
+        <span>
+          <strong>Close tabs after stashing</strong>
+          <small>Applies to the popup and the quick-stash shortcut. A window is never emptied.</small>
+        </span>
+      </label>
+    </section>
+
+    <section>
+      <h2>Quick-stash shortcut</h2>
+      <p class="note">Saves the current tab with no prompt. <span id="shortcut"></span></p>
+      <label class="row">
+        <input type="radio" name="quickTarget" value="inbox" />
+        <span><strong>Always the Inbox group</strong><small>Sort it into a real group later from the stash page.</small></span>
+      </label>
+      <label class="row">
+        <input type="radio" name="quickTarget" value="last" />
+        <span><strong>The group I used last</strong><small>Falls back to the Inbox if that group is gone.</small></span>
+      </label>
+    </section>
+
+    <p class="note"><a id="shortcuts" href="#">Change keyboard shortcuts</a></p>
+    <p id="status" class="note" role="status" aria-live="polite"></p>
+
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

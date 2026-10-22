@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
+    <button id="openBoard" class="view" title="Open the stash page">
+      <span>View stash</span><span id="boardCount" class="count"></span>
+    </button>
+
     <header>
       <div id="scopes" role="radiogroup" aria-label="What to stash"></div>
       <p id="subject" class="subject"></p>
@@ -21,11 +25,13 @@
       spellcheck="false"
       aria-label="Group name"
     />
+    <div id="suggest" class="suggest" hidden></div>
     <ul id="rows" role="listbox" aria-label="Groups"></ul>
 
     <footer>
       <label><input id="closeAfter" type="checkbox" /> Close tabs after stashing</label>
       <span id="status" role="status" aria-live="polite"></span>
+
     </footer>
 
     <script type="module" src="popup.js"></script>

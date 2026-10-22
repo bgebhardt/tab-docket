@@ -1,6 +1,6 @@
 # Tab Stash: Design
 
-Status: v0.1, implemented and unit tested, UI not yet exercised in a browser.
+Status: v0.2, implemented and unit tested, UI not yet exercised in a browser.
 
 ## Problem
 
@@ -42,9 +42,9 @@ The stash is a bookmarks folder `Tab Stash` with one subfolder per group.
 
 Bookmarks give sync, search, an unlimited quota, and survive extension removal for free. The cost is that users can edit the data from outside the extension, so the code must tolerate that (see Edge cases).
 
-### 2. New Tab override as the visibility mechanism
+### 2. A one-keystroke stash page instead of a New Tab override
 
-The whole premise is that the list must be seen without effort. A popup, side panel or dashboard has to be opened deliberately, which is exactly the habit that failed with session managers. The cost: it takes over the New Tab page, which only one extension can own.
+The premise is that the list must be easy to see. v0.1 overrode the New Tab page, but in Comet the New Tab is the Perplexity box and that is staying. So the list is a regular extension page (`board/board.html`) opened with `Alt+Shift+O` or the popup's "View stash" link; an existing stash tab is focused rather than duplicated. Trade-off: it has to be opened deliberately, so the habit matters (see WORKFLOW). Pinning that tab is a cheap way to keep it in sight. A side panel was considered but Comet already uses its side panel for the assistant.
 
 ### 3. Queue ordering and staleness
 
@@ -58,7 +58,15 @@ The popup puts focus in a text field that filters groups. `Enter` picks the high
 
 A URL appears at most once in the stash. Stashing an already-stashed page moves it into the chosen group. Rationale: duplicates inflate the "work remaining" number and the user's intent is clearly "this belongs in X now".
 
-### 6. Plain MV3, no build step
+### 6. Quick stash
+
+`Alt+Shift+Q` runs in the service worker with no UI: it stashes the active tab to the Inbox (or the last-used group, per option) and closes it if `closeAfter` is on. Invocations are serialized so rapid presses cannot create two Inbox folders. An unstashable page flashes a red `!` on the badge instead of failing silently.
+
+### 7. Group name suggestions
+
+Offline first: `suggestGroupNames` (pure, in `util.js`) proposes words shared by 2+ titles and the dominant site. On top of that `lib/ai.js` asks the browser's built-in Prompt API (on-device model) for a 1–3 word name, only if the model is already downloaded (it never triggers a download) and with an 8 s timeout. Suggestions are chips that fill the name box; nothing is created until the user presses Enter. A cloud LLM (e.g. the Claude API) would give better names but needs an API key and network access, which conflicts with the "no network requests" constraint, so it is not used.
+
+### 8. Plain MV3, no build step
 
 The code is ES modules loaded directly by the browser; there is nothing to compile, so loading the folder unpacked is the entire install. DOM is built with `createElement`/`textContent` (never `innerHTML`) so page titles cannot inject markup, in addition to the MV3 default CSP.
 
@@ -78,7 +86,7 @@ The code is ES modules loaded directly by the browser; there is nothing to compi
 
 - `lib/util.js` has no browser dependencies and is unit tested directly.
 - `lib/stash.js` owns every chrome API call except the badge and UI-only calls. It is tested against `tests/fake-chrome.js`, an in-memory bookmarks/tabs/storage implementation.
-- The New Tab page and badge subscribe to bookmark events, so changes from any source (popup, another window, the bookmark manager, sync) show up live. Event bursts are debounced (100–150 ms).
+- The stash page and badge subscribe to bookmark events, so changes from any source (popup, another window, the bookmark manager, sync) show up live. Event bursts are debounced (100–150 ms).
 
 ## Data model
 
@@ -92,13 +100,17 @@ Other bookmarks/
     └── <bookmark>        ← loose item → shown as the pseudo-group "Unsorted"
 ```
 
-Settings in `chrome.storage.local`: `closeAfter` (default `true`), `lastGroupId`, `rootId`.
+Settings in `chrome.storage.local`: `closeAfter` (default `false`), `quickTarget` (`inbox` | `last`, default `inbox`), `lastGroupId`, `rootId`.
 
 ## Flows
 
 **Stash**: popup loads the tabs in the current window and the groups. The default scope is *Selected* if more than one tab is highlighted, else *This tab*. On choose: create the group if new, `stashTabs` (create or move bookmarks), remember the group, close the tabs that are now safely stored (if enabled), show a summary, close the popup.
 
-**Revisit**: new tab shows the cards. Click an item to open it in that tab; `✓` removes it (Undo for 6 s); **Open & clear** opens a group and empties it.
+**Quick stash**: command fires in the service worker, takes the active tab of the focused window, resolves the target group, `stashTabs`, then `closeTabs` if enabled.
+
+**Flag & bulk act**: checkboxes keep a set of flagged item ids in memory only (they are never written to bookmarks, so they reset on reload and are pruned when an item disappears). `pickItems` resolves them to items in board order, which keeps Undo's restore indexes ascending.
+
+**Revisit**: the stash page shows the cards. Click an item to open it in that tab; `✓` removes it (Undo for 6 s); **Open & clear** opens a group and empties it.
 
 ## Edge cases
 
@@ -120,24 +132,27 @@ Settings in `chrome.storage.local`: `closeAfter` (default `true`), `lastGroupId`
 
 Automated (`npm test`): all of `lib/util.js` and `lib/stash.js` against the fake chrome API: root creation and recovery, group idempotency, stash/dedupe/move, skip rules, Unsorted, delete/restore, window-preserving close.
 
-Not automated: popup and New Tab UI. Manual checklist after changes:
+Not automated: popup, stash page, options and the command handlers. Manual checklist after changes:
 
-1. Load unpacked; open a new tab, which shows the empty state.
+1. Load unpacked; press `Alt+Shift+O`: the stash page opens with the empty state. Press it again: the same tab is focused. A new tab still shows Comet's own page.
 2. On a normal page press `Alt+Shift+S`, type a name, `Enter`. Tab closes, badge shows 1, new tab shows the card.
-3. Stash the same page again to a different group: it moves rather than duplicates.
+3. Quick stash: on a normal page press `Alt+Shift+Q`. The tab closes, the badge count goes up and an `Inbox` group exists. Press it on `chrome://settings`: red `!` flash, tab stays. Toggle *Close tabs after stashing* off in options: the tab stays open.
+3a. Stash the same page again to a different group: it moves rather than duplicates.
 4. Select three tabs (`Shift`-click) and stash: scope defaults to *Selected (3)*.
 5. Stash *Window* with pinned tabs: pins stay.
 6. Stash the only tab in a window: window stays open on a new tab.
 7. `chrome://settings` shows "can't be stashed" and is not closed.
-8. New Tab page: `✓` plus Undo, drag between groups, rename, delete, Open & clear, filter box.
-9. Edit the `Tab Stash` folder in the bookmark manager: New Tab updates live.
+8. Stash page: `✓` plus Undo, drag between groups, rename, delete, Open & clear, filter box.
+9. Edit the `Tab Stash` folder in the bookmark manager: the stash page updates live.
+10a. Select 3 tabs about one topic and open the popup: name chips appear; clicking one fills the box. If the browser has Gemini Nano a `✨` chip appears after a moment.
+10b. Flag two items in different groups and a whole group via its header checkbox: the bar shows the count. Open opens them, Move to… relocates them (also to a new group), Delete removes them and Undo restores them in place, Esc clears flags.
 10. Toggle dark mode in the OS: both pages follow.
 
 ## Risks and open questions
 
-- **Comet compatibility** has not been confirmed. The `_favicon` endpoint, the New Tab override and `commands` should behave as in Chromium, but verify. If `chrome_url_overrides` is blocked, the popup still works.
+- **Comet compatibility** has not been confirmed. The `_favicon` endpoint and `commands` should behave as in Chromium, but verify. The Prompt API (`LanguageModel`) may not exist in Comet; the heuristic chips cover that.
 - **Bookmarks sync noise**: stash churn appears in bookmark sync and in "Recently added" bookmark views.
-- **Keyboard shortcut** `Alt+Shift+S` may collide with another extension; rebind at `chrome://extensions/shortcuts`.
+- **Keyboard shortcuts** (`Alt+Shift+S`, `Q`, `O`) may collide with another extension; rebind at `chrome://extensions/shortcuts`.
 
 ## Future ideas
 
