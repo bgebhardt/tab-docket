@@ -1,0 +1,121 @@
+body {
+  width: 340px;
+  padding: 12px;
+}
+
+header {
+  margin-bottom: 10px;
+}
+
+#scopes {
+  display: flex;
+  gap: 4px;
+  background: var(--surface-hover);
+  border-radius: 8px;
+  padding: 3px;
+}
+
+#scopes button {
+  flex: 1;
+  border: 0;
+  background: none;
+  border-radius: 6px;
+  padding: 4px 6px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+#scopes button[aria-checked="true"] {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.15);
+}
+
+.subject {
+  margin: 8px 2px 0;
+  color: var(--muted);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#query {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+#rows {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+#rows button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: none;
+  border-radius: 8px;
+  padding: 7px 10px;
+  text-align: left;
+}
+
+#rows button:hover,
+#rows button.active {
+  background: var(--surface-hover);
+}
+
+#rows button.active {
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+#rows .name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#rows .count,
+#rows .hint {
+  color: var(--muted);
+  font-size: 12px;
+  flex: none;
+}
+
+#rows .create .name {
+  color: var(--accent);
+}
+
+footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+footer label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+#status {
+  color: var(--accent);
+  font-weight: 600;
+}

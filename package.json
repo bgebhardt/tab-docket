@@ -1,0 +1,13 @@
+{
+  "name": "tab-stash",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A visible working set of tabs for Chromium browsers.",
+  "scripts": {
+    "test": "node --test tests/",
+    "icons": "python3 tools/make-icons.py",
+    "check": "for f in background.js lib/*.js popup/*.js newtab/*.js; do node --check $f || exit 1; done"
+  },
+  "license": "MIT"
+}
