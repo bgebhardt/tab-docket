@@ -6,6 +6,8 @@ Chromium MV3 extension (no build step, no dependencies). Read `README.md` for us
 
 The owner (Bryan) runs Comet (Chromium-based) with far too many tabs and had memory pressure (Comet alone used 6–13 GB, swap nearly full). He already uses Tab Manager Plus (finding open tabs), Session Buddy (stashing whole sessions) and Raindrop.io (long-term storage). His recurring problem: anything saved goes out of sight and is never revisited. Tab Stash is a **working set**: tabs to deal with soon, grouped by topic, shown on every New Tab page, with age/staleness surfaced. It is deliberately **not** an archive, session manager or tab sleeper.
 
+The full picture of his tools and where each fits is in `docs/WORKFLOW.md`.
+
 Hard requirements from him: free (no paid tiers, no caps), send a single tab to a group quickly, groups organized by type, list kept visible. Toby (60-tab free cap) and Workona were rejected; the built-in Reading List was rejected because it has no grouping.
 
 ## Constraints and decisions to keep

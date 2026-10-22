@@ -8,6 +8,8 @@ Send a tab to a named group with one keystroke, close it, and see the whole list
 
 Session managers and read-later tools fail the same way: once a tab is saved it is out of sight, so you never return. Tab Stash fixes that by replacing your New Tab page with the list, and by being a *queue* rather than a vault. Long-term storage belongs in a bookmark manager such as Raindrop. Tab Stash is for the tabs you want to deal with this week.
 
+See [docs/WORKFLOW.md](docs/WORKFLOW.md) for how it fits with the other tab tools in use (Tab Manager Plus, Session Buddy, Raindrop.io).
+
 ## Features
 
 - **Stash from the toolbar or `Alt+Shift+S`**: pick a group (type to filter, `↑`/`↓` to move, `Enter` to choose) or type a new name and press `Enter` to create it.
@@ -78,6 +80,7 @@ newtab/              New Tab override
 styles/theme.css     shared light/dark theme
 tests/               node:test suites + fake chrome API
 docs/DESIGN.md       goals, decisions, edge cases
+docs/WORKFLOW.md     the owner's tab workflow and companion extensions
 ```
 
 The popup and New Tab UI are not covered by automated tests; verify them by loading the extension. See [docs/DESIGN.md](docs/DESIGN.md) for the manual test checklist.
