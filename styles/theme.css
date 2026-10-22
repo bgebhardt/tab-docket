@@ -10,6 +10,9 @@
   --stale: #b45309;
   --stale-bg: #fef3c7;
   --danger: #b91c1c;
+  --star: #ca8a04;
+  --star-bg: #fff7d6;
+  --star-bg-hover: #ffefb0;
   --radius: 10px;
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   color-scheme: light dark;
@@ -28,6 +31,9 @@
     --stale: #fbbf24;
     --stale-bg: #3a2e0f;
     --danger: #f87171;
+    --star: #facc15;
+    --star-bg: #342d12;
+    --star-bg-hover: #43391a;
   }
 }
 

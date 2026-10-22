@@ -52,7 +52,7 @@ New items are appended so the **oldest is on top**. Each item shows its age, and
 
 ### 4. Typing is the primary interaction
 
-The popup puts focus in a text field that filters groups. `Enter` picks the highlighted row, and if the typed name matches nothing, a "Create" row appears, so the same keystroke flow covers both choosing and creating. The most recently used group is listed first, which makes repeated stashing to one group a two-key action.
+The popup puts focus in a text field that filters groups. `Enter` picks the highlighted row, and if the typed name matches nothing, a "Create" row appears, so the same keystroke flow covers both choosing and creating. Groups are sorted by the shared sort setting. The default, last modified, puts the group you just stashed into at the top, so repeated stashing to one group is still a two-key action; with other sorts the last-used group is no longer pinned first.
 
 ### 5. Duplicates move rather than copy
 
@@ -100,7 +100,7 @@ Other bookmarks/
     └── <bookmark>        ← loose item → shown as the pseudo-group "Unsorted"
 ```
 
-Settings in `chrome.storage.local`: `closeAfter` (default `false`), `quickTarget` (`inbox` | `last`, default `inbox`), `lastGroupId`, `rootId`.
+Settings in `chrome.storage.local`: `closeAfter` (default `false`), `quickTarget` (`inbox` | `last`, default `inbox`), `groupSort` (`modified` | `alpha` | `size` | `oldest` | `manual`, default `modified`; "modified" uses the folder's `dateGroupModified`), `starred` (bookmark ids of starred items; pruned when an item disappears, carried over to the new id on Undo; per profile, not synced), `collapsed` (ids of folded groups; pruned of deleted groups on load), `lastGroupId`, `rootId`.
 
 ## Flows
 
@@ -145,6 +145,9 @@ Not automated: popup, stash page, options and the command handlers. Manual check
 8. Stash page: `✓` plus Undo, drag between groups, rename, delete, Open & clear, filter box.
 9. Edit the `Tab Stash` folder in the bookmark manager: the stash page updates live.
 10a. Select 3 tabs about one topic and open the popup: name chips appear; clicking one fills the box. If the browser has Gemini Nano a `✨` chip appears after a moment.
+10c. Change the sort in the stash page and in the popup: both lists reorder and the choice sticks (it is the same setting). Stash a tab to a group: with *Last modified* that group moves to the top.
+10d. Star two items: gold background, ★ stays visible; ☆ appears on hover for the rest. Move a starred item to another group, and delete + Undo one: both keep the star. Check both OS themes.
+10a. Collapse a group with ▾, reload the page: it stays collapsed. Type in the filter: matches inside it appear. Collapsing a group unflags its tabs.
 10b. Flag two items in different groups and a whole group via its header checkbox: the bar shows the count. Open opens them, Move to… relocates them (also to a new group), Delete removes them and Undo restores them in place, Esc clears flags.
 10. Toggle dark mode in the OS: both pages follow.
 

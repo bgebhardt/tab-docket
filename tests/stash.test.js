@@ -209,3 +209,13 @@ test('closeTabs throws when the browser says it removed a tab but the tab is sti
   fake.calls.ignoreRemove = true;
   await assert.rejects(stash.closeTabs([fake.tabs[0]]), /did not close the tab \(tab id 1\)/);
 });
+
+test('getGroups exposes order, modified and oldest for sorting', async () => {
+  const a = await stash.createGroup('A');
+  await stash.createGroup('B');
+  await stash.stashTabs([tab(1, 'https://one.test/')], a.id);
+  const { groups } = await stash.getGroups();
+  assert.deepEqual(groups.map((g) => g.order), [0, 1]);
+  assert.ok(groups[0].modified > 0 && groups[0].oldest > 0);
+  assert.equal(groups[1].oldest, undefined);
+});

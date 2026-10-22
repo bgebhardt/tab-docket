@@ -5,6 +5,9 @@ All notable changes to this project are documented here. Format follows [Keep a 
 ## [0.2.0] - 2026-10-22
 
 ### Added
+- Star tabs on the stash page: starred rows get a gold-tinted background (light and dark themes).
+- Group sorting on the stash page and in the popup: last modified (default), A–Z, most tabs, oldest tab first, folder order. The choice is remembered.
+- Collapsible groups on the stash page; the folded state is remembered.
 - Flag tabs on the stash page (per item or per group) and act on them in bulk: Open, Move to a group (or new group), Delete with Undo.
 - Stash page header buttons that open (or focus) Tab Manager Plus and Session Buddy.
 - Quick stash shortcut (`Alt+Shift+Q`): saves the active tab and closes it with no popup. Goes to the Inbox, or the last-used group (option).

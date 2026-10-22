@@ -2,14 +2,16 @@ import {
   createGroup,
   deleteGroup,
   getGroups,
+  getSettings,
   moveItem,
   openItems,
   openOrFocus,
   removeItem,
   renameGroup,
   restoreItem,
+  setSettings,
 } from '../lib/stash.js';
-import { COMPANION_TOOLS, STALE_DAYS, ageLabel, domainOf, isStale, pickItems } from '../lib/util.js';
+import { COMPANION_TOOLS, SORT_MODES, STALE_DAYS, ageLabel, domainOf, isStale, pickItems, sortGroups } from '../lib/util.js';
 
 const $ = (selector) => document.querySelector(selector);
 const OPEN_CONFIRM_THRESHOLD = 10;
@@ -19,6 +21,9 @@ let query = '';
 let draggingId = null;
 let toastTimer = null;
 let undo = null;
+let sortMode = 'modified';
+const collapsedIds = new Set(); // folded groups, saved in settings.collapsed
+const starredIds = new Set(); // starred items, saved in settings.starred
 const flagged = new Set(); // ids of flagged items (in memory only)
 
 function el(tag, className, text) {
@@ -39,8 +44,13 @@ function button(label, className, onClick, title) {
 
 async function load() {
   ({ groups } = await getGroups());
+  groups = sortGroups(groups, sortMode);
   const existing = new Set(groups.flatMap((g) => g.items.map((i) => i.id)));
   for (const id of flagged) if (!existing.has(id)) flagged.delete(id);
+  const before = starredIds.size;
+  for (const id of starredIds) if (!existing.has(id)) starredIds.delete(id);
+  if (starredIds.size !== before) setSettings({ starred: [...starredIds] });
+  for (const id of collapsedIds) if (!groups.some((g) => g.id === id)) collapsedIds.delete(id);
   render();
 }
 
@@ -104,8 +114,13 @@ function itemEl(item, group) {
   const age = el('span', isStale(item.dateAdded) ? 'age stale' : 'age', ageLabel(item.dateAdded));
   if (isStale(item.dateAdded)) age.title = `In the stash for ${STALE_DAYS}+ days — do it or drop it`;
 
+  const starred = starredIds.has(item.id);
+  li.classList.toggle('starred', starred);
+  const star = button(starred ? '★' : '☆', starred ? 'ghost star on' : 'ghost star', () => toggleStar(item), starred ? 'Unstar' : 'Star — make this stand out');
+  star.setAttribute('aria-pressed', String(starred));
+
   const done = button('✓', 'ghost done', () => dismiss(item, group), 'Done — remove from stash');
-  li.append(flag, link, age, done);
+  li.append(flag, link, age, star, done);
   return li;
 }
 
@@ -113,7 +128,13 @@ function groupEl(group) {
   const items = group.items.filter((item) => matches(item, group));
   const section = el('section', 'group');
 
+  // While filtering, show matches even inside folded groups.
+  const collapsed = collapsedIds.has(group.id) && !query.trim();
+  section.classList.toggle('collapsed', collapsed);
+
   const head = el('div', 'group-head');
+  const fold = button(collapsed ? '▸' : '▾', 'ghost fold', () => toggleCollapsed(group), collapsed ? 'Expand group' : 'Collapse group');
+  fold.setAttribute('aria-expanded', String(!collapsed));
   const visibleIds = items.map((i) => i.id);
   const flaggedHere = visibleIds.filter((id) => flagged.has(id)).length;
   const all = el('input', 'flag');
@@ -124,28 +145,28 @@ function groupEl(group) {
   all.title = 'Flag every tab in this group';
   all.setAttribute('aria-label', `Flag all in ${group.title}`);
   all.addEventListener('change', () => toggleFlag(visibleIds, all.checked));
-  head.append(all, el('h2', '', group.title), el('span', 'count', String(group.items.length)));
+  head.append(fold, all, el('h2', '', group.title), el('span', 'count', String(group.items.length)));
   section.append(head);
 
   const actions = el('div', 'actions');
-  if (group.items.length) {
+  if (!collapsed && group.items.length) {
     actions.append(
       button('Open all', 'ghost', () => openGroup(group, false), 'Open every tab, keep them stashed'),
       button('Open & clear', 'ghost', () => openGroup(group, true), 'Open every tab and remove them from the stash'),
     );
   }
-  if (!group.isRoot) {
+  if (!collapsed && !group.isRoot) {
     actions.append(
       button('Rename', 'ghost', () => rename(group)),
       button('Delete', 'ghost danger', () => remove(group)),
     );
   }
-  section.append(actions);
+  if (!collapsed) section.append(actions);
 
   const list = el('ul', 'items');
-  for (const item of items) list.append(itemEl(item, group));
-  section.append(list);
-  if (!group.items.length) section.append(el('p', 'empty', 'Empty — stash tabs here from the toolbar button.'));
+  for (const item of collapsed ? [] : items) list.append(itemEl(item, group));
+  if (!collapsed) section.append(list);
+  if (!collapsed && !group.items.length) section.append(el('p', 'empty', 'Empty — stash tabs here from the toolbar button.'));
 
   section.addEventListener('dragover', (e) => {
     if (!draggingId) return;
@@ -196,6 +217,34 @@ function render() {
 }
 
 // ---------- flagged tabs ----------
+
+async function toggleStar(item) {
+  if (starredIds.has(item.id)) starredIds.delete(item.id);
+  else starredIds.add(item.id);
+  render();
+  await setSettings({ starred: [...starredIds] });
+}
+
+// Undo re-creates a bookmark with a new id, so carry the star over to it.
+async function restoreStarred(entry, wasStarred) {
+  const node = await restoreItem(entry);
+  if (wasStarred && node?.id) {
+    starredIds.add(node.id);
+    await setSettings({ starred: [...starredIds] });
+  }
+}
+
+async function toggleCollapsed(group) {
+  if (collapsedIds.has(group.id)) {
+    collapsedIds.delete(group.id);
+  } else {
+    collapsedIds.add(group.id);
+    // Hidden tabs must not stay flagged, or bulk actions would hit things you can't see.
+    for (const item of group.items) flagged.delete(item.id);
+  }
+  render();
+  await setSettings({ collapsed: [...collapsedIds] });
+}
 
 function toggleFlag(ids, on) {
   for (const id of ids) {
@@ -248,9 +297,10 @@ function showToast(message, onUndo) {
 
 async function dismiss(item, group) {
   const index = group.items.findIndex((i) => i.id === item.id);
+  const wasStarred = starredIds.has(item.id);
   await removeItem(item.id);
   showToast('Removed from stash', async () => {
-    await restoreItem({ parentId: group.id, index, title: item.title, url: item.url });
+    await restoreStarred({ parentId: group.id, index, title: item.title, url: item.url }, wasStarred);
   });
 }
 
@@ -263,11 +313,12 @@ async function openFlagged() {
 async function deleteFlagged() {
   const picked = pickItems(groups, flagged);
   flagged.clear();
+  const wasStarred = new Set(picked.filter((p) => starredIds.has(p.item.id)).map((p) => p.item.id));
   for (const { item } of picked) await removeItem(item.id);
   showToast(`Removed ${picked.length} tab${picked.length === 1 ? '' : 's'} from stash`, async () => {
     // picked is in board order, so indexes are restored lowest first within each group.
     for (const { item, group, index } of picked) {
-      await restoreItem({ parentId: group.id, index, title: item.title, url: item.url });
+      await restoreStarred({ parentId: group.id, index, title: item.title, url: item.url }, wasStarred.has(item.id));
     }
   });
 }
@@ -346,6 +397,12 @@ $('#search').addEventListener('input', (e) => {
   render();
 });
 $('#newGroup').addEventListener('click', addGroup);
+$('#sort').addEventListener('change', async (e) => {
+  sortMode = e.target.value;
+  groups = sortGroups(groups, sortMode);
+  render();
+  await setSettings({ groupSort: sortMode });
+});
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && flagged.size && !(e.target instanceof HTMLInputElement)) toggleFlag([...flagged], false);
 });
@@ -371,8 +428,18 @@ for (const event of ['onCreated', 'onRemoved', 'onMoved', 'onChanged', 'onImport
   chrome.bookmarks[event].addListener(scheduleReload);
 }
 
-load().catch((err) => {
-  console.error(err);
-  $('#summary').textContent = 'Failed to load the stash: ' + err.message;
-});
+getSettings()
+  .then((settings) => {
+    settings.collapsed.forEach((id) => collapsedIds.add(id));
+    settings.starred.forEach((id) => starredIds.add(id));
+    sortMode = settings.groupSort;
+    for (const mode of SORT_MODES) $('#sort').append(new Option(mode.label, mode.key));
+    $('#sort').value = sortMode;
+  })
+  .catch((err) => console.warn('Tab Stash: could not read collapsed groups', err))
+  .then(load)
+  .catch((err) => {
+    console.error(err);
+    $('#summary').textContent = 'Failed to load the stash: ' + err.message;
+  });
 showShortcutHint();

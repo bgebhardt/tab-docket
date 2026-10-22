@@ -21,6 +21,9 @@ See [docs/WORKFLOW.md](docs/WORKFLOW.md) for how it fits with the other tab tool
   - Pages in the stash 14+ days are highlighted as stale.
   - `✓` marks an item done (with Undo), **Open all** / **Open & clear** restore a whole group, and you can rename or delete groups.
   - Drag an item onto another group to move it.
+  - **Star tabs** with the ☆ button (shown on hover) to give them a soft gold background so they stand out. Stars are remembered, survive moves between groups and Undo, but are stored in this browser profile only (not synced).
+  - **Sort groups** (also in the popup's group list; one shared setting): last modified (default), A–Z, most tabs, oldest tab first (what's going stale), or folder order. "Unsorted" always stays on top.
+  - **Collapse groups** with the ▾ arrow to hide the ones you don't need right now. Folded groups are remembered, still count towards the totals, and still accept drops. Filtering shows matches inside folded groups.
   - **Flag tabs** with the checkboxes (or a group's checkbox for the whole group); a bar appears with **Open**, **Move to…** (any group or a new one), **Delete** (with Undo) and **Clear** (`Esc`). Flags are not saved across page loads.
   - Header buttons open Tab Manager Plus and Session Buddy in a tab (they must be installed).
   - Filter box searches titles, URLs and group names.

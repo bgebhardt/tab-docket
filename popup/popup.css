@@ -189,3 +189,22 @@ footer label {
   font-size: 12px;
   font-weight: 400;
 }
+
+.sortbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.sortbar select {
+  font: inherit;
+  padding: 1px 4px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+}

@@ -36,7 +36,7 @@ h1 {
 
 #board {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(600px, 100%), 1fr));
   gap: 16px;
   align-items: start;
 }
@@ -267,4 +267,62 @@ h1 {
   border-radius: 6px;
   background: var(--surface);
   color: var(--text);
+}
+
+.fold {
+  padding: 0 4px;
+  min-width: 20px;
+}
+
+.group.collapsed {
+  opacity: 0.8;
+}
+
+.group.collapsed .group-head {
+  margin: 0;
+}
+
+.sortbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.sortbar select {
+  font: inherit;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.item.starred {
+  background: var(--star-bg);
+}
+
+.item.starred:hover {
+  background: var(--star-bg-hover);
+}
+
+.item.starred.flagged {
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.star {
+  flex: none;
+  opacity: 0;
+  color: var(--muted);
+}
+
+.star.on {
+  opacity: 1;
+  color: var(--star);
+}
+
+.item:hover .star,
+.star:focus-visible {
+  opacity: 1;
 }

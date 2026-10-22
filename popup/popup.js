@@ -14,6 +14,8 @@ import {
   filterGroups,
   hasGroupNamed,
   isStashable,
+  SORT_MODES,
+  sortGroups,
   suggestGroupNames,
 } from '../lib/util.js';
 
@@ -27,6 +29,8 @@ const state = {
   active: 0,
   busy: false,
   suggestions: [], // [{ name, ai }]
+  rawGroups: [], // unsorted candidates
+  sort: 'modified',
 };
 
 function el(tag, className, text) {
@@ -52,12 +56,19 @@ async function loadScopes() {
   state.scope = scopes.find((s) => s.key === 'selected') ?? scopes[0];
 }
 
-async function loadGroups(lastGroupId) {
+async function loadGroups() {
   const { groups } = await getGroups();
-  const candidates = groups.filter((g) => !g.isRoot).map((g) => ({ id: g.id, title: g.title, count: g.items.length }));
+  const candidates = groups
+    .filter((g) => !g.isRoot)
+    .map((g) => ({ id: g.id, title: g.title, count: g.items.length, order: g.order, modified: g.modified, oldest: g.oldest }));
+  // Not created until something is stashed into it, so it has no dates and sorts last.
   if (!hasGroupNamed(candidates, INBOX_TITLE)) candidates.push({ id: null, title: INBOX_TITLE, count: 0 });
-  candidates.sort((a, b) => (b.id === lastGroupId) - (a.id === lastGroupId));
-  state.groups = candidates;
+  state.rawGroups = candidates;
+  applySort();
+}
+
+function applySort() {
+  state.groups = sortGroups(state.rawGroups, state.sort);
 }
 
 // ---------- rendering ----------
@@ -214,7 +225,19 @@ async function init() {
   $('#closeAfter').checked = settings.closeAfter;
   $('#closeAfter').addEventListener('change', (e) => setSettings({ closeAfter: e.target.checked }));
 
-  await Promise.all([loadScopes(), loadGroups(settings.lastGroupId)]);
+  state.sort = settings.groupSort;
+  await Promise.all([loadScopes(), loadGroups()]);
+  const sort = $('#sort');
+  for (const mode of SORT_MODES) sort.append(new Option(mode.label, mode.key));
+  sort.value = state.sort;
+  sort.addEventListener('change', async () => {
+    state.sort = sort.value;
+    applySort();
+    state.active = 0;
+    renderRows();
+    $('#query').focus();
+    await setSettings({ groupSort: state.sort });
+  });
   renderScopes();
   renderSubject();
   renderRows();

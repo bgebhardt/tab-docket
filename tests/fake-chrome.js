@@ -65,6 +65,7 @@ export function installFakeChrome() {
       },
       async create({ parentId = '2', title = '', url, index }) {
         const parent = need(parentId);
+        parent.dateGroupModified = Date.now();
         const node = add({ id: String(nextId++), parentId, title, dateAdded: Date.now(), ...(url ? { url } : { children: [] }) });
         parent.children.splice(index ?? parent.children.length, 0, node.id);
         return pub(node);

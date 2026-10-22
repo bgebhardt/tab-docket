@@ -12,7 +12,9 @@ import {
   isStashable,
   normalizeUrl,
   pickItems,
+  SORT_MODES,
   siteLabel,
+  sortGroups,
   suggestGroupNames,
 } from '../lib/util.js';
 
@@ -132,4 +134,30 @@ test('pickItems returns flagged items in board order with their group and index'
   ];
   const picked = pickItems(groups, new Set(['d', 'c', 'a', 'gone']));
   assert.deepEqual(picked.map((p) => [p.item.id, p.group.id, p.index]), [['a', 'g1', 0], ['c', 'g1', 2], ['d', 'g2', 0]]);
+});
+
+const sortable = [
+  { id: 'a', title: 'beta', count: 2, modified: 300, oldest: 50, order: 0 },
+  { id: 'b', title: 'Alpha', count: 5, modified: 100, oldest: 10, order: 1 },
+  { id: 'c', title: 'gamma', count: 0, modified: 200, order: 2 },
+  { id: 'u', title: 'Unsorted', isRoot: true, count: 1, modified: 1, oldest: 999, order: -1 },
+];
+const order = (mode) => sortGroups(sortable, mode).map((g) => g.id).join('');
+
+test('sortGroups modes', () => {
+  assert.equal(order('modified'), 'uacb');
+  assert.equal(order('alpha'), 'ubac');
+  assert.equal(order('size'), 'ubac');
+  assert.equal(order('oldest'), 'ubac'); // empty group last
+  assert.equal(order('manual'), 'uabc');
+  assert.equal(order('nonsense'), 'uacb'); // falls back to the default
+  assert.equal(SORT_MODES[0].key, 'modified');
+});
+
+test('sortGroups does not mutate its input and breaks ties by title', () => {
+  const before = sortable.map((g) => g.id).join('');
+  sortGroups(sortable, 'alpha');
+  assert.equal(sortable.map((g) => g.id).join(''), before);
+  const tied = [{ id: 'x', title: 'B', count: 1 }, { id: 'y', title: 'a', count: 1 }];
+  assert.deepEqual(sortGroups(tied, 'size').map((g) => g.id), ['y', 'x']);
 });
