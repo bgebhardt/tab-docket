@@ -101,6 +101,20 @@ function itemEl(item, group) {
   link.href = item.url;
   link.title = item.url;
   link.rel = 'noopener';
+  // Always open in a new tab so the stash page stays put. Cmd/Ctrl-click and middle-click open it in the background.
+  const openInTab = async (e) => {
+    e.preventDefault();
+    const background = e.button === 1 || e.metaKey || e.ctrlKey;
+    try {
+      await chrome.tabs.create({ url: item.url, active: !background });
+    } catch (err) {
+      showToast(`Couldn’t open tab: ${err.message}`);
+    }
+  };
+  link.addEventListener('click', openInTab);
+  link.addEventListener('auxclick', (e) => {
+    if (e.button === 1) openInTab(e);
+  });
 
   const icon = el('img', 'favicon');
   icon.src = faviconUrl(item.url);

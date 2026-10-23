@@ -16,6 +16,7 @@ All notable changes to this project are documented here. Format follows [Keep a 
 - `Alt+Shift+O` and a "View stash" button at the top of the popup open (or focus) the stash page.
 
 ### Changed
+- Clicking a stashed tab on the stash page opens it in a new tab, leaving the stash page open (previously it replaced the stash page).
 - Closing tabs after stashing is now off by default, and `closeTabs` retries then verifies the tab is really gone, reporting an error if the browser ignores the request.
 - The stash page no longer overrides the New Tab page (Comet's New Tab is Perplexity). It lives at `board/board.html` and is opened by shortcut or from the popup.
 

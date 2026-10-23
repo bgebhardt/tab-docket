@@ -19,6 +19,7 @@ See [docs/WORKFLOW.md](docs/WORKFLOW.md) for how it fits with the other tab tool
 - **Close tabs after stashing is an option** (off by default; popup checkbox or options page, applies to quick stash too). A window is never emptied: if every tab would close, a fresh tab opens first.
 - **The stash page shows your groups** (`Alt+Shift+O`, or the "View stash" button at the top of the popup) as cards, with favicon, title, domain and age for each page.
   - Pages in the stash 14+ days are highlighted as stale.
+  - Clicking a tab opens it in a **new tab** and keeps the stash page open (Cmd/Ctrl-click or middle-click opens it in the background).
   - `✓` marks an item done (with Undo), **Open all** / **Open & clear** restore a whole group, and you can rename or delete groups.
   - Drag an item onto another group to move it.
   - **Star tabs** with the ☆ button (shown on hover) to give them a soft gold background so they stand out. Stars are remembered, survive moves between groups and Undo, but are stored in this browser profile only (not synced).

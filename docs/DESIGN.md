@@ -110,7 +110,7 @@ Settings in `chrome.storage.local`: `closeAfter` (default `false`), `quickTarget
 
 **Flag & bulk act**: checkboxes keep a set of flagged item ids in memory only (they are never written to bookmarks, so they reset on reload and are pruned when an item disappears). `pickItems` resolves them to items in board order, which keeps Undo's restore indexes ascending.
 
-**Revisit**: the stash page shows the cards. Click an item to open it in that tab; `✓` removes it (Undo for 6 s); **Open & clear** opens a group and empties it.
+**Revisit**: the stash page shows the cards. Click an item to open it in a new tab (Cmd/Ctrl- or middle-click: background tab); `✓` removes it (Undo for 6 s); **Open & clear** opens a group and empties it.
 
 ## Edge cases
 
