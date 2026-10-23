@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Tab Stash options</title>
+    <title>Tab Docket options</title>
     <link rel="stylesheet" href="../styles/theme.css" />
     <link rel="stylesheet" href="options.css" />
   </head>
   <body>
-    <h1>Tab Stash options</h1>
+    <h1>Tab Docket options</h1>
 
     <section>
       <label class="row">
@@ -31,6 +31,20 @@
         <input type="radio" name="quickTarget" value="last" />
         <span><strong>The group I used last</strong><small>Falls back to the Inbox if that group is gone.</small></span>
       </label>
+    </section>
+
+    <section class="about">
+      <h2>About</h2>
+      <p><strong id="aboutName"></strong> <span id="aboutVersion"></span></p>
+      <p>Written by <span id="aboutAuthor"></span>.</p>
+      <p id="aboutCopyright"></p>
+      <p class="note" id="aboutDisclaimer"></p>
+      <p class="links">
+        <a id="aboutRepo" target="_blank" rel="noopener">Source &amp; releases</a> ·
+        <a id="aboutLicense" target="_blank" rel="noopener">License</a> ·
+        <a id="aboutPrivacy" target="_blank" rel="noopener">Privacy</a> ·
+        <a id="aboutIssues" target="_blank" rel="noopener">Report a problem</a>
+      </p>
     </section>
 
     <p class="note"><a id="shortcuts" href="#">Change keyboard shortcuts</a></p>

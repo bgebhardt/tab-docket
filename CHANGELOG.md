@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.3.0] - 2026-10-23
+
+First public release.
+
+### Changed
+- Renamed from "Tab Stash" to **Tab Docket**, because Tab Stash is an established Firefox extension. An existing `Tab Stash` bookmarks folder is adopted and renamed to `Tab Docket` automatically; nothing is lost.
+
+### Added
+- About section on the options page and a credit line on the stash page (author, copyright, license, links, disclaimer).
+- `PRIVACY.md`, `author` and `homepage_url` in the manifest.
+- `npm run release` builds `dist/tab-docket-vX.Y.Z.zip` (plus SHA-256) and refuses to build if versions disagree.
+
 ## [0.2.0] - 2026-10-22
 
 ### Added

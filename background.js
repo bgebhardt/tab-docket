@@ -18,7 +18,7 @@ async function updateBadge() {
     await chrome.action.setBadgeText({ text: badgeText(count) });
     await chrome.action.setBadgeBackgroundColor({ color: '#4f46e5' });
   } catch (err) {
-    console.warn('Tab Stash: badge update failed', err);
+    console.warn('Tab Docket: badge update failed', err);
   }
 }
 
@@ -54,7 +54,7 @@ async function runQuickStash() {
     const result = await quickStash(tab);
     if (!result.done.length) await flashBadge('!', '#dc2626'); // internal page, nothing stashed
   } catch (err) {
-    console.error('Tab Stash: quick stash failed', err);
+    console.error('Tab Docket: quick stash failed', err);
     await flashBadge('ERR', '#dc2626');
   }
 }

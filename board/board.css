@@ -326,3 +326,11 @@ h1 {
 .star:focus-visible {
   opacity: 1;
 }
+
+.credit {
+  margin-top: 4px;
+}
+
+.credit a {
+  color: var(--muted);
+}

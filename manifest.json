@@ -1,8 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "Tab Stash",
-  "version": "0.2.0",
-  "description": "A visible working set of tabs. Send tabs to named groups, stash the current tab with one shortcut, and keep the list one keystroke away.",
+  "name": "Tab Docket",
+  "version": "0.3.0",
+  "author": "Bryan Gebhardt",
+  "homepage_url": "https://github.com/bgebhardt/tab-docket",
+  "description": "A visible working set of tabs: send tabs to named groups and stash the current tab with one shortcut.",
   "permissions": ["bookmarks", "tabs", "storage", "favicon"],
   "action": {
     "default_title": "Stash tab",

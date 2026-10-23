@@ -1,4 +1,4 @@
-# Tab Stash
+# Tab Docket
 
 A browser extension for Chromium browsers (Chrome, Comet, Arc, Edge, Brave…) that keeps a **visible working set of tabs**.
 
@@ -6,7 +6,7 @@ Send a tab to a named group with one keystroke, close it, and keep the whole lis
 
 ## Why
 
-Session managers and read-later tools fail the same way: once a tab is saved it is out of sight, so you never return. Tab Stash fixes that by keeping the list one keystroke away (`Alt+Shift+O`), and by being a *queue* rather than a vault. Long-term storage belongs in a bookmark manager such as Raindrop. Tab Stash is for the tabs you want to deal with this week.
+Session managers and read-later tools fail the same way: once a tab is saved it is out of sight, so you never return. Tab Docket fixes that by keeping the list one keystroke away (`Alt+Shift+O`), and by being a *queue* rather than a vault. Long-term storage belongs in a bookmark manager such as Raindrop. Tab Docket is for the tabs you want to deal with this week.
 
 See [docs/WORKFLOW.md](docs/WORKFLOW.md) for how it fits with the other tab tools in use (Tab Manager Plus, Session Buddy, Raindrop.io).
 
@@ -32,25 +32,48 @@ See [docs/WORKFLOW.md](docs/WORKFLOW.md) for how it fits with the other tab tool
 - **No duplicates**: stashing a page that is already stashed moves it to the chosen group.
 - **No server, no account, no tracking.** Data lives in your browser's bookmarks (see below).
 
-## Install (unpacked)
+## Install
 
-1. Open `chrome://extensions` (in Comet: `comet://extensions`).
-2. Turn on **Developer mode**.
-3. Click **Load unpacked** and choose this folder.
-4. Optionally pin the toolbar icon and check the shortcut at `chrome://extensions/shortcuts`.
+Tab Docket is not in the Chrome Web Store, so you install it by hand. It takes about a minute and works in Chrome, Comet, Edge, Brave, Arc and other Chromium browsers.
 
-Reload the extension from the same page after pulling changes.
+### From a release (recommended)
+
+1. Go to the [latest release](https://github.com/bgebhardt/tab-docket/releases/latest) and download `tab-docket-vX.Y.Z.zip`.
+   - Optional: check the download against the `.sha256` file on the same page (`shasum -a 256 tab-docket-vX.Y.Z.zip` on macOS/Linux, `certutil -hashfile <file> SHA256` on Windows).
+2. **Unzip it.** You get a folder named `tab-docket-vX.Y.Z`. Put it somewhere permanent (for example your Documents folder): the browser reads the extension from that folder every time it starts, so don't delete or move it afterwards.
+3. Open the extensions page: `chrome://extensions` (Comet: `comet://extensions`, Edge: `edge://extensions`, Brave: `brave://extensions`).
+4. Turn on **Developer mode** (top right).
+5. Click **Load unpacked** and select the unzipped `tab-docket-vX.Y.Z` folder (the one that contains `manifest.json`, not the zip).
+6. Pin the Tab Docket icon from the puzzle-piece menu so it is one click away, and check the shortcuts at `chrome://extensions/shortcuts`.
+
+Your browser may show a "disable developer mode extensions" notice at startup. That is normal for any extension loaded this way.
+
+### Update
+
+Download the new release, unzip it over the old folder (or into a new one), then click the reload arrow on the Tab Docket card in the extensions page (or **Load unpacked** the new folder after removing the old one). Your stash is stored in your bookmarks, so it carries over.
+
+### Uninstall
+
+Remove it from the extensions page. Your stashed tabs stay in the **Tab Docket** bookmarks folder until you delete that folder.
+
+### From source
+
+```sh
+git clone https://github.com/bgebhardt/tab-docket.git
+```
+
+Then follow steps 3 to 6 above, choosing the cloned folder. To build the release zip yourself: `npm run release` (writes `dist/`).
 
 The extension does not touch your New Tab page. Open the stash page with `Alt+Shift+O`. Shortcuts can be changed at `chrome://extensions/shortcuts`; a clash with another extension just leaves that one unassigned.
 
 ## Where your data lives
 
-The stash is a normal bookmarks folder named **Tab Stash** in *Other bookmarks*. Each subfolder is a group and each bookmark is a stashed tab.
+The stash is a normal bookmarks folder named **Tab Docket** in *Other bookmarks*. Each subfolder is a group and each bookmark is a stashed tab.
 
 - It syncs through your browser account's bookmark sync, if you use it.
 - It is searchable from the address bar and any bookmark manager.
 - Uninstalling the extension leaves your data intact.
-- Bookmarks added directly to the `Tab Stash` folder show up in an **Unsorted** group. Folders nested inside a group are ignored.
+- Bookmarks added directly to the `Tab Docket` folder show up in an **Unsorted** group. Folders nested inside a group are ignored.
 - Settings (close-after-stash, quick-stash target, last used group) are kept in `chrome.storage.local`.
 
 New items are appended, so the **oldest item is at the top** of each group.
@@ -84,11 +107,14 @@ background.js        service worker: toolbar badge, quick-stash and open-stash c
 lib/util.js          pure helpers (unit tested)
 lib/stash.js         bookmarks/tabs/storage logic (unit tested against a fake)
 lib/ai.js            optional on-device AI group naming
+lib/about.js         product/author/license text shown in the UI
 popup/               toolbar popup
 board/               stash page (all groups)
 options/             options page
 styles/theme.css     shared light/dark theme
 tests/               node:test suites + fake chrome API
+tools/build-release.js builds dist/tab-docket-vX.Y.Z.zip
+PRIVACY.md           privacy policy
 docs/DESIGN.md       goals, decisions, edge cases
 docs/WORKFLOW.md     the owner's tab workflow and companion extensions
 ```
@@ -102,6 +128,18 @@ The popup, stash page and options UI are not covered by automated tests; verify 
 - Opening a large group at once can use a lot of memory (you get a confirmation above 10 tabs).
 - Developed against Chromium's extension APIs; Firefox is not supported.
 
-## License
+## About
 
-MIT. See [LICENSE](LICENSE).
+**Tab Docket** is written by **Bryan Gebhardt**. Copyright © 2026 Bryan Gebhardt.
+
+- Licensed under the [MIT License](LICENSE): free to use, copy, modify and share, with the copyright notice kept.
+- See [PRIVACY.md](PRIVACY.md): no data collection, no network requests.
+- Bugs and ideas: [open an issue](https://github.com/bgebhardt/tab-docket/issues).
+
+### Disclaimer
+
+This software is provided "as is", without warranty of any kind, express or implied, including fitness for a particular purpose and non-infringement. In no event shall the author be liable for any claim, damages or other liability arising from its use. It reads and writes your bookmarks and can close browser tabs (an option that is off by default), so keep a backup of anything important.
+
+### Trademarks and affiliation
+
+Tab Docket is an independent project and is not affiliated with, endorsed by, or sponsored by Google, Perplexity (Comet), Microsoft, or the makers of Tab Stash (Firefox), Tab Manager Plus, Session Buddy or Raindrop.io. Product names are used only to describe compatibility or workflow, and all trademarks are the property of their respective owners. The name "Tab Docket" was chosen to avoid confusion with the existing Firefox extension *Tab Stash* by Josh Berry.

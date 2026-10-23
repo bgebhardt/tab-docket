@@ -1,11 +1,12 @@
 {
-  "name": "tab-stash",
-  "version": "0.1.0",
+  "name": "tab-docket",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "description": "A visible working set of tabs for Chromium browsers.",
   "scripts": {
     "test": "node --test tests/",
+    "release": "node tools/build-release.js",
     "icons": "python3 tools/make-icons.py",
     "check": "for f in background.js lib/*.js popup/*.js board/*.js options/*.js; do node --check $f || exit 1; done"
   },

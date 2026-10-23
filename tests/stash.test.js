@@ -22,7 +22,7 @@ test('getGroups returns nothing and creates nothing before first use', async () 
 test('getRootId creates the folder once, even when called concurrently', async () => {
   const ids = await Promise.all([stash.getRootId(), stash.getRootId(), stash.getRootId()]);
   assert.equal(new Set(ids).size, 1);
-  const roots = [...fake.nodes.values()].filter((n) => n.title === 'Tab Stash');
+  const roots = [...fake.nodes.values()].filter((n) => n.title === 'Tab Docket');
   assert.equal(roots.length, 1);
   assert.equal(roots[0].parentId, '2');
 });
@@ -218,4 +218,13 @@ test('getGroups exposes order, modified and oldest for sorting', async () => {
   assert.deepEqual(groups.map((g) => g.order), [0, 1]);
   assert.ok(groups[0].modified > 0 && groups[0].oldest > 0);
   assert.equal(groups[1].oldest, undefined);
+});
+
+test('getRootId adopts and renames a folder from the old product name', async () => {
+  const old = await chrome.bookmarks.create({ title: 'Tab Stash' });
+  const id = await stash.getRootId({ create: false });
+  assert.equal(id, old.id);
+  assert.equal(fake.nodes.get(old.id).title, 'Tab Docket');
+  const roots = [...fake.nodes.values()].filter((n) => n.title === 'Tab Docket' || n.title === 'Tab Stash');
+  assert.equal(roots.length, 1);
 });

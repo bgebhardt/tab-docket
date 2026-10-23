@@ -161,3 +161,14 @@ test('sortGroups does not mutate its input and breaks ties by title', () => {
   const tied = [{ id: 'x', title: 'B', count: 1 }, { id: 'y', title: 'a', count: 1 }];
   assert.deepEqual(sortGroups(tied, 'size').map((g) => g.id), ['y', 'x']);
 });
+
+test('release metadata is consistent', async () => {
+  const { readFileSync } = await import('node:fs');
+  const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
+  const manifest = JSON.parse(read('manifest.json'));
+  assert.equal(JSON.parse(read('package.json')).version, manifest.version);
+  assert.ok(read('CHANGELOG.md').includes(`## [${manifest.version}]`));
+  assert.ok(manifest.description.length <= 132, 'Web Store limit for descriptions');
+  assert.equal(manifest.author, 'Bryan Gebhardt');
+  assert.match(read('LICENSE'), /Copyright \(c\) \d{4} Bryan Gebhardt/);
+});

@@ -1,3 +1,4 @@
+import { ABOUT, copyrightLine } from '../lib/about.js';
 import { getSettings, setSettings } from '../lib/stash.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -7,7 +8,20 @@ function saved() {
   setTimeout(() => ($('#status').textContent = ''), 1200);
 }
 
+function renderAbout() {
+  $('#aboutName').textContent = ABOUT.name;
+  $('#aboutVersion').textContent = `v${chrome.runtime.getManifest().version}`;
+  $('#aboutAuthor').textContent = ABOUT.author;
+  $('#aboutCopyright').textContent = copyrightLine();
+  $('#aboutDisclaimer').textContent = ABOUT.disclaimer;
+  $('#aboutRepo').href = ABOUT.repoUrl;
+  $('#aboutLicense').href = ABOUT.licenseUrl;
+  $('#aboutPrivacy').href = ABOUT.privacyUrl;
+  $('#aboutIssues').href = ABOUT.issuesUrl;
+}
+
 async function init() {
+  renderAbout();
   const settings = await getSettings();
   $('#closeAfter').checked = settings.closeAfter;
   for (const radio of document.querySelectorAll('input[name="quickTarget"]')) {

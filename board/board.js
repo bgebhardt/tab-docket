@@ -11,6 +11,7 @@ import {
   restoreItem,
   setSettings,
 } from '../lib/stash.js';
+import { ABOUT, copyrightLine } from '../lib/about.js';
 import { COMPANION_TOOLS, SORT_MODES, STALE_DAYS, ageLabel, domainOf, isStale, pickItems, sortGroups } from '../lib/util.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -215,7 +216,7 @@ function render() {
     const welcome = el('div', 'welcome');
     welcome.append(
       el('h2', '', 'Your working set is empty'),
-      el('p', '', 'Click the Tab Stash toolbar button on any page to park it in a group, or press the quick-stash shortcut to save and close a tab in one step.'),
+      el('p', '', 'Click the Tab Docket toolbar button on any page to park it in a group, or press the quick-stash shortcut to save and close a tab in one step.'),
     );
     board.append(welcome);
     return;
@@ -450,10 +451,12 @@ getSettings()
     for (const mode of SORT_MODES) $('#sort').append(new Option(mode.label, mode.key));
     $('#sort').value = sortMode;
   })
-  .catch((err) => console.warn('Tab Stash: could not read collapsed groups', err))
+  .catch((err) => console.warn('Tab Docket: could not read collapsed groups', err))
   .then(load)
   .catch((err) => {
     console.error(err);
     $('#summary').textContent = 'Failed to load the stash: ' + err.message;
   });
 showShortcutHint();
+$('#credit').textContent = `${ABOUT.name} v${chrome.runtime.getManifest().version} · written by ${ABOUT.author} · ${copyrightLine().split('. ')[1]}`;
+$('#credit').append(' · ', Object.assign(el('a', '', 'About'), { href: chrome.runtime.getURL('options/options.html'), target: '_blank' }));

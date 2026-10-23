@@ -1,4 +1,4 @@
-# Tab Stash: Design
+# Tab Docket: Design
 
 Status: v0.2, implemented and unit tested, UI not yet exercised in a browser.
 
@@ -32,7 +32,7 @@ What is missing is a **working set**: tabs I want to get to soon, grouped by top
 
 ### 1. Store data as bookmarks
 
-The stash is a bookmarks folder `Tab Stash` with one subfolder per group.
+The stash is a bookmarks folder `Tab Docket` with one subfolder per group.
 
 | Alternative | Why not |
 |---|---|
@@ -76,7 +76,7 @@ The code is ES modules loaded directly by the browser; there is nothing to compi
             ┌───────────────┐   chrome.bookmarks events   ┌──────────────┐
  toolbar ──▶│ popup/        │                             │ background.js│──▶ badge count
  Alt+Shift+S│ popup.js      │──┐                          └──────────────┘
-            └───────────────┘  │ lib/stash.js ──▶ chrome.bookmarks ("Tab Stash" folder)
+            └───────────────┘  │ lib/stash.js ──▶ chrome.bookmarks ("Tab Docket" folder)
             ┌───────────────┐  │      ▲            chrome.tabs, chrome.storage.local
  new tab ──▶│ newtab/       │──┘      │
             │ newtab.js     │◀────────┘ re-render on bookmark events
@@ -92,7 +92,7 @@ The code is ES modules loaded directly by the browser; there is nothing to compi
 
 ```
 Other bookmarks/
-└── Tab Stash/            ← root (id cached in storage.local; re-found by title if stale)
+└── Tab Docket/            ← root (id cached in storage.local; re-found by title if stale)
     ├── Inbox/            ← group
     │   ├── <bookmark>    ← stashed tab (title, url, dateAdded)
     │   └── …
@@ -143,7 +143,7 @@ Not automated: popup, stash page, options and the command handlers. Manual check
 6. Stash the only tab in a window: window stays open on a new tab.
 7. `chrome://settings` shows "can't be stashed" and is not closed.
 8. Stash page: `✓` plus Undo, drag between groups, rename, delete, Open & clear, filter box.
-9. Edit the `Tab Stash` folder in the bookmark manager: the stash page updates live.
+9. Edit the `Tab Docket` folder in the bookmark manager: the stash page updates live.
 10a. Select 3 tabs about one topic and open the popup: name chips appear; clicking one fills the box. If the browser has Gemini Nano a `✨` chip appears after a moment.
 10c. Change the sort in the stash page and in the popup: both lists reorder and the choice sticks (it is the same setting). Stash a tab to a group: with *Last modified* that group moves to the top.
 10d. Star two items: gold background, ★ stays visible; ☆ appears on hover for the rest. Move a starred item to another group, and delete + Undo one: both keep the star. Check both OS themes.
