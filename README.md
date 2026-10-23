@@ -27,6 +27,27 @@ A browser extension for Chromium browsers (Chrome, Comet, Arc, Edge, Brave…) t
 
 Send a tab to a named group with one keystroke, close it, and keep the whole list one shortcut away. It is built for tabs you intend to come back to *soon*, not an archive. Stale items are flagged so they don't quietly rot.
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/stash-page.png" alt="The Tab Docket stash page: groups sorted by last modified, starred tabs highlighted in gold, stale tabs marked with an age chip, one group collapsed" width="900">
+</p>
+
+<table>
+  <tr>
+    <td align="center" valign="top" width="300">
+      <img src="docs/screenshots/popup.png" alt="The toolbar popup: scope switcher, group name suggestion and a sortable list of groups" width="280"><br>
+      <sub>The popup: pick a group, type a new one, or take a suggested name.</sub>
+    </td>
+    <td align="center" valign="top">
+      <img src="docs/screenshots/stash-page-dark.png" alt="The stash page in dark mode with three tabs flagged and the bulk action bar showing Open, Move to, Delete and Clear" width="620"><br>
+      <sub>Dark mode follows your system. Flag tabs to open, move or delete them in bulk.</sub>
+    </td>
+  </tr>
+</table>
+
+<sub>Screenshots use sample data. The site icons are placeholders; in the browser you get each site's real icon.</sub>
+
 ## Why
 
 Session managers and read-later tools fail the same way: once a tab is saved it is out of sight, so you never return. Tab Docket fixes that by keeping the list one keystroke away (`Alt+Shift+O`), and by being a *queue* rather than a vault. Long-term storage belongs in a bookmark manager such as Raindrop. Tab Docket is for the tabs you want to deal with this week.

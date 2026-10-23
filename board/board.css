@@ -334,3 +334,8 @@ h1 {
 .credit a {
   color: var(--muted);
 }
+
+/* Keep the last rows and the footer reachable while the bulk bar floats over the page. */
+body:has(.bulk:not([hidden])) {
+  padding-bottom: 96px;
+}
