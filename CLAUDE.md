@@ -38,7 +38,7 @@ Load for manual testing: `comet://extensions` → Developer mode → Load unpack
 
 ## Releasing
 
-The product is **Tab Docket** (renamed from "Tab Stash", which is an established Firefox extension by Josh Berry; don't revert). Author/copyright: Bryan Gebhardt, MIT (`LICENSE`, `lib/about.js`, README "About", `PRIVACY.md`). The legacy `Tab Stash` bookmarks folder is adopted by `getRootId`.
+The product is **Tab Docket** (renamed from "Tab Stash", which is an established Firefox extension by Josh Berry; don't revert). Author/copyright: Bryan Gebhardt, MIT (`LICENSE`, `lib/about.js`, README "About", `PRIVACY.md`). The legacy `Tab Stash` bookmarks folder is used in place by `getRootId` (never renamed: lookups must not write, and the title may belong to another extension).
 
 1. Bump `version` in `manifest.json` and `package.json`; add a `## [x.y.z]` entry to `CHANGELOG.md` (the build and a test enforce all three agree).
 2. `npm test && npm run release` -> `dist/tab-docket-vX.Y.Z.zip` + `.sha256` (dist/ is git-ignored).

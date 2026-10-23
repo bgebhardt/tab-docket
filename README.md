@@ -1,4 +1,27 @@
-# Tab Docket
+<p align="center">
+  <img src="icons/icon128.png" alt="Tab Docket icon" width="96" height="96">
+</p>
+
+<h1 align="center">Tab Docket</h1>
+
+<p align="center">
+  <strong>A visible working set of tabs for Chromium browsers.</strong><br>
+  Free, local, no account.
+</p>
+
+<p align="center">
+  <a href="https://github.com/bgebhardt/tab-docket/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/bgebhardt/tab-docket?color=4f46e5"></a>
+  <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-4f46e5"></a>
+  <img alt="Manifest V3" src="https://img.shields.io/badge/Chromium-MV3-4f46e5">
+</p>
+
+<p align="center">
+  <a href="#install">Install</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#about">About</a>
+</p>
+
+---
 
 A browser extension for Chromium browsers (Chrome, Comet, Arc, Edge, Brave…) that keeps a **visible working set of tabs**.
 

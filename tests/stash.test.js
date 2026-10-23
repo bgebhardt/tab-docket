@@ -220,11 +220,11 @@ test('getGroups exposes order, modified and oldest for sorting', async () => {
   assert.equal(groups[1].oldest, undefined);
 });
 
-test('getRootId adopts and renames a folder from the old product name', async () => {
+test('getRootId uses a folder from the old product name in place, without renaming it', async () => {
   const old = await chrome.bookmarks.create({ title: 'Tab Stash' });
   const id = await stash.getRootId({ create: false });
   assert.equal(id, old.id);
-  assert.equal(fake.nodes.get(old.id).title, 'Tab Docket');
+  assert.equal(fake.nodes.get(old.id).title, 'Tab Stash');
   const roots = [...fake.nodes.values()].filter((n) => n.title === 'Tab Docket' || n.title === 'Tab Stash');
   assert.equal(roots.length, 1);
 });

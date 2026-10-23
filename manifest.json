@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Tab Docket",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "author": "Bryan Gebhardt",
   "homepage_url": "https://github.com/bgebhardt/tab-docket",
   "description": "A visible working set of tabs: send tabs to named groups and stash the current tab with one shortcut.",

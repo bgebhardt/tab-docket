@@ -2,12 +2,20 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.3.1] - 2026-10-23
+
+### Added
+- Icon, badges and quick links at the top of the GitHub README.
+
+### Fixed
+- Finding a stash folder from the old name (`Tab Stash`) no longer renames it, and a read-only lookup never writes to your bookmarks. The folder is used in place and keeps its title.
+
 ## [0.3.0] - 2026-10-23
 
 First public release.
 
 ### Changed
-- Renamed from "Tab Stash" to **Tab Docket**, because Tab Stash is an established Firefox extension. An existing `Tab Stash` bookmarks folder is adopted and renamed to `Tab Docket` automatically; nothing is lost.
+- Renamed from "Tab Stash" to **Tab Docket**, because Tab Stash is an established Firefox extension. An existing `Tab Stash` bookmarks folder is picked up automatically; nothing is lost. (0.3.0 also renamed it; that rename was removed afterwards, see Unreleased.)
 
 ### Added
 - About section on the options page and a credit line on the stash page (author, copyright, license, links, disclaimer).
