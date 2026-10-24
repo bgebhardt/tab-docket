@@ -127,7 +127,7 @@ function itemEl(item, group) {
   link.append(icon, text);
 
   const age = el('span', isStale(item.dateAdded) ? 'age stale' : 'age', ageLabel(item.dateAdded));
-  if (isStale(item.dateAdded)) age.title = `In the stash for ${STALE_DAYS}+ days — do it or drop it`;
+  if (isStale(item.dateAdded)) age.title = `Saved for ${STALE_DAYS}+ days — do it or drop it`;
 
   const starred = starredIds.has(item.id);
   li.classList.toggle('starred', starred);
@@ -167,7 +167,7 @@ function groupEl(group) {
   if (!collapsed && group.items.length) {
     actions.append(
       button('Open all', 'ghost', () => openGroup(group, false), 'Open every tab, keep them stashed'),
-      button('Open & clear', 'ghost', () => openGroup(group, true), 'Open every tab and remove them from the stash'),
+      button('Open & clear', 'ghost', () => openGroup(group, true), 'Open every tab and remove them from Tab Docket'),
     );
   }
   if (!collapsed && !group.isRoot) {
@@ -207,10 +207,13 @@ function render() {
 
   const total = groups.reduce((sum, g) => sum + g.items.length, 0);
   const stale = groups.reduce((sum, g) => sum + g.items.filter((i) => isStale(i.dateAdded)).length, 0);
+  const starred = groups.reduce((sum, g) => sum + g.items.filter((i) => starredIds.has(i.id)).length, 0);
+  const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
   $('#summary').textContent = total
-    ? `${total} tab${total === 1 ? '' : 's'} in ${groups.length} group${groups.length === 1 ? '' : 's'}` +
-      (stale ? ` · ${stale} stale` : '')
-    : 'Nothing stashed';
+    ? [plural(total, 'tab'), plural(groups.length, 'group'), starred && `${starred} starred`, stale && `${stale} stale`]
+        .filter(Boolean)
+        .join(' · ')
+    : 'Nothing saved yet';
 
   if (!groups.length) {
     const welcome = el('div', 'welcome');
@@ -291,7 +294,7 @@ function renderBulk() {
     el('span', 'bulk-count', `${picked.length} flagged`),
     button('Open', 'ghost', () => openFlagged(), 'Open the flagged tabs, keep them stashed'),
     move,
-    button('Delete', 'ghost danger', () => deleteFlagged(), 'Remove the flagged tabs from the stash'),
+    button('Delete', 'ghost danger', () => deleteFlagged(), 'Remove the flagged tabs from Tab Docket'),
     button('Clear', 'ghost', () => toggleFlag([...flagged], false), 'Unflag everything (Esc)'),
   );
 }
@@ -455,7 +458,7 @@ getSettings()
   .then(load)
   .catch((err) => {
     console.error(err);
-    $('#summary').textContent = 'Failed to load the stash: ' + err.message;
+    $('#summary').textContent = 'Failed to load your saved tabs: ' + err.message;
   });
 showShortcutHint();
 $('#credit').textContent = `${ABOUT.name} v${chrome.runtime.getManifest().version} · written by ${ABOUT.author} · ${copyrightLine().split('. ')[1]}`;

@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.3.3] - 2026-10-23
+
+### Changed
+- The popup button now reads "View saved tabs" (plain words instead of "stash").
+- The header of the full page shows total tabs, groups, starred and stale counts.
+
 ## [0.3.2] - 2026-10-23
 
 ### Added

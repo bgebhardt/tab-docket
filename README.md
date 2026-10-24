@@ -61,7 +61,7 @@ See [docs/WORKFLOW.md](docs/WORKFLOW.md) for how it fits with the other tab tool
 - **Three scopes**: this tab, the tabs you multi-selected (`Shift`/`Cmd`-click), or the whole window (pinned tabs are left alone).
 - **Name suggestions**: the popup offers group names based on the tabs' titles and sites, and an on-device AI name where the browser supports the Prompt API (Gemini Nano). Nothing is sent over the network.
 - **Close tabs after stashing is an option** (off by default; popup checkbox or options page, applies to quick stash too). A window is never emptied: if every tab would close, a fresh tab opens first.
-- **The stash page shows your groups** (`Alt+Shift+O`, or the "View stash" button at the top of the popup) as cards, with favicon, title, domain and age for each page.
+- **The stash page shows your groups** (`Alt+Shift+O`, or the "View saved tabs" button at the top of the popup) as cards, with favicon, title, domain and age for each page.
   - Pages in the stash 14+ days are highlighted as stale.
   - Clicking a tab opens it in a **new tab** and keeps the stash page open (Cmd/Ctrl-click or middle-click opens it in the background).
   - `✓` marks an item done (with Undo), **Open all** / **Open & clear** restore a whole group, and you can rename or delete groups.

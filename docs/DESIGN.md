@@ -44,7 +44,7 @@ Bookmarks give sync, search, an unlimited quota, and survive extension removal f
 
 ### 2. A one-keystroke stash page instead of a New Tab override
 
-The premise is that the list must be easy to see. v0.1 overrode the New Tab page, but in Comet the New Tab is the Perplexity box and that is staying. So the list is a regular extension page (`board/board.html`) opened with `Alt+Shift+O` or the popup's "View stash" link; an existing stash tab is focused rather than duplicated. Trade-off: it has to be opened deliberately, so the habit matters (see WORKFLOW). Pinning that tab is a cheap way to keep it in sight. A side panel was considered but Comet already uses its side panel for the assistant.
+The premise is that the list must be easy to see. v0.1 overrode the New Tab page, but in Comet the New Tab is the Perplexity box and that is staying. So the list is a regular extension page (`board/board.html`) opened with `Alt+Shift+O` or the popup's "View saved tabs" button; an existing stash tab is focused rather than duplicated. Trade-off: it has to be opened deliberately, so the habit matters (see WORKFLOW). Pinning that tab is a cheap way to keep it in sight. A side panel was considered but Comet already uses its side panel for the assistant.
 
 ### 3. Queue ordering and staleness
 
